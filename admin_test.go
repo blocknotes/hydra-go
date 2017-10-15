@@ -38,7 +38,7 @@ func TestAdminCreate(t *testing.T) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 }
@@ -48,7 +48,7 @@ func TestAdminIndex(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/admin/collections", nil)
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 	// check content
@@ -66,7 +66,7 @@ func TestAdminUpdate(t *testing.T) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 }
@@ -76,7 +76,7 @@ func TestAdminRead(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/admin/collections/posts", nil)
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 	// check content
@@ -92,7 +92,7 @@ func TestAdminDestroy(t *testing.T) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 }

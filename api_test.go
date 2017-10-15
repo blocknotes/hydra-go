@@ -40,7 +40,7 @@ func TestApiCreate(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/api/articles/articles", body)
 	req.Header.Add("Content-Type", "application/json")
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 	// check content
@@ -58,7 +58,7 @@ func TestApiUpdate(t *testing.T) {
 	req, _ := http.NewRequest("PUT", "/api/articles/articles/"+id, body)
 	req.Header.Add("Content-Type", "application/json")
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 }
@@ -67,7 +67,7 @@ func TestApiIndex(t *testing.T) {
 	app := apiSetup()
 	req, _ := http.NewRequest("GET", "/api/articles/articles", nil)
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 	// check content
@@ -81,7 +81,7 @@ func TestApiRead(t *testing.T) {
 	app := apiSetup()
 	req, _ := http.NewRequest("GET", "/api/articles/articles/"+id, nil)
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 	// check content
@@ -96,7 +96,7 @@ func TestApiDestroy(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/articles/articles/"+id, nil)
 	req.Header.Add("Content-Type", "application/json")
 	res := httptest.NewRecorder()
-	app.router.ServeHTTP(res, req)
+	app.Router.ServeHTTP(res, req)
 	// check status
 	assert.Equal(t, res.Code, 200)
 }

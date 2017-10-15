@@ -8,6 +8,10 @@ Features:
 - basic auth for admin routes
 - built using Gin, a Mongo DB is required
 
+To do:
+
+- projects management
+
 ![hydra](hydra.png)
 
 ### Admin examples

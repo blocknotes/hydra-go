@@ -1,2 +1,4 @@
 _misc/
 _run.sh
+server.key
+server.pem
