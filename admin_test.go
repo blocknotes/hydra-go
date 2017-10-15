@@ -18,8 +18,8 @@ func adminSetup() *App {
 		Name: "Hydra Go",
 		Conf: Conf{
 			Database:       "_hydra",
-			Collection:     "_collections",
 			AuthCollection: "_auth",
+			Projects:       "_projects",
 		},
 		DB:     DB{"localhost:27017"},
 		Router: gin.Default(),
@@ -33,7 +33,7 @@ func TestAdminCreate(t *testing.T) {
 	app := adminSetup()
 	data := `{"data":{"name":"posts","singular":"post","columns":{"title":{"type":"String","validations":"required"},"description":{"type":"String"},"position":{"type":"Float"},"published":{"type":"Boolean"},"dt":{"type":"DateTime"}}}}`
 	body := bytes.NewBufferString(data)
-	req, _ := http.NewRequest("POST", "/admin/collections", body)
+	req, _ := http.NewRequest("POST", "/admin/projects", body)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
@@ -44,7 +44,7 @@ func TestAdminCreate(t *testing.T) {
 
 func TestAdminIndex(t *testing.T) {
 	app := adminSetup()
-	req, _ := http.NewRequest("GET", "/admin/collections", nil)
+	req, _ := http.NewRequest("GET", "/admin/projects", nil)
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
 	app.Router.ServeHTTP(res, req)
@@ -61,7 +61,7 @@ func TestAdminUpdate(t *testing.T) {
 	app := adminSetup()
 	data := `{"data":{"description":"A test..."}}`
 	body := bytes.NewBufferString(data)
-	req, _ := http.NewRequest("PUT", "/admin/collections/posts", body)
+	req, _ := http.NewRequest("PUT", "/admin/projects/posts", body)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
@@ -72,7 +72,7 @@ func TestAdminUpdate(t *testing.T) {
 
 func TestAdminRead(t *testing.T) {
 	app := adminSetup()
-	req, _ := http.NewRequest("GET", "/admin/collections/posts", nil)
+	req, _ := http.NewRequest("GET", "/admin/projects/posts", nil)
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()
 	app.Router.ServeHTTP(res, req)
@@ -87,7 +87,7 @@ func TestAdminRead(t *testing.T) {
 
 func TestAdminDestroy(t *testing.T) {
 	app := adminSetup()
-	req, _ := http.NewRequest("DELETE", "/admin/collections/posts", nil)
+	req, _ := http.NewRequest("DELETE", "/admin/projects/posts", nil)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("mat:123")))
 	res := httptest.NewRecorder()

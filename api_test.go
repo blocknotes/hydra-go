@@ -21,8 +21,8 @@ func apiSetup() *App {
 		Name: "Hydra Go",
 		Conf: Conf{
 			Database:       "_hydra",
-			Collection:     "_collections",
 			AuthCollection: "_auth",
+			Projects:       "_projects",
 		},
 		DB:     DB{"localhost:27017"},
 		Router: gin.Default(),

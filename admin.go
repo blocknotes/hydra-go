@@ -5,24 +5,34 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// curl 'http://localhost:8080/admin/collections'
-func (app App) AdminList(c *gin.Context) {
-	data, code, err := app.DB.FindAll(app.Conf.Database, app.Conf.Collection)
-	if err != nil {
-		// fmt.Println(err) // TODO: log me !
-		c.JSON(code, gin.H{
-			"status":  "error",
-			"message": err.Error(),
-		})
+// curl -X POST 'http://127.0.0.1:8080/admin/projects' -H 'Content-Type: application/json' --data '{"data":{"name":"hydra1","description":"Hydra 1","collections":[]}}'
+func (app App) AdminCreate(c *gin.Context) {
+	var data FormData
+	if c.BindJSON(&data) == nil {
+		data, code, err := app.DB.Create(app.Conf.Database, app.Conf.Projects, data)
+		if err != nil {
+			// fmt.Println(err) // TODO: log me !
+			c.JSON(code, gin.H{
+				"message": err.Error(),
+				"status":  "error",
+			})
+		} else {
+			c.JSON(code, data)
+		}
 	} else {
-		c.JSON(code, data)
+		// fmt.Println(err) // TODO: log me !
+		c.JSON(400, gin.H{
+			"message": "Bad request",
+			"status":  "error",
+		})
 	}
+	// TODO: update app Collections
 }
 
-// curl 'http://localhost:8080/admin/collections/articles'
+// curl 'http://127.0.0.1:8080/admin/projects/hydra1'
 func (app App) AdminRead(c *gin.Context) {
-	appCollection := c.Param("collection")
-	data, code, err := app.DB.FindOne(app.Conf.Database, app.Conf.Collection, "name", appCollection)
+	appProject := c.Param("project")
+	data, code, err := app.DB.FindOne(app.Conf.Database, app.Conf.Projects, "name", appProject)
 	if err != nil {
 		// fmt.Println(err) // TODO: log me !
 		c.JSON(code, gin.H{
@@ -35,28 +45,10 @@ func (app App) AdminRead(c *gin.Context) {
 	}
 }
 
-// curl -X POST 'http://localhost:8080/admin/collections' -H 'Content-Type: application/json' --data '{"data":{"name":"articles","singular":"article","columns":{"title":{"type":"String"},"email":{"type":"String","validations":"required,email"},"description":{"type":"String"},"position":{"type":"Float"},"published":{"type":"Boolean"},"dt":{"type":"DateTime"}}}}'
-func (app App) AdminCreate(c *gin.Context) {
-	var data FormData
-	if c.BindJSON(&data) == nil {
-		data, code, err := app.DB.Create(app.Conf.Database, app.Conf.Collection, data)
-		if err != nil {
-			// fmt.Println(err) // TODO: log me !
-			c.JSON(code, gin.H{
-				"status":  "error",
-				"message": err.Error(),
-			})
-		} else {
-			c.JSON(code, data)
-		}
-	}
-	// TODO: update app Collections
-}
-
-// curl -X PUT 'http://localhost:8080/admin/collections/articles' -H 'Content-Type: application/json' --data '{"data":{"name":"articles","columns":{"subtitle":{"type":"String"},"email":{"type":"String","validations":"required,email"}}}}'
+// curl -X PUT 'http://127.0.0.1:8080/admin/projects/hydra1' -H 'Content-Type: application/json' --data '{"data":{"collections":[{"name":"articles","singular":"article","columns":{"title":{"type":"String"},"email":{"type":"String","validations":"required,email"},"description":{"type":"String"},"position":{"type":"Float"},"published":{"type":"Boolean"},"dt":{"type":"DateTime"}}}]}}'
 func (app App) AdminUpdate(c *gin.Context) {
-	appCollection := c.Param("collection")
-	data, code, err := app.DB.FindOne(app.Conf.Database, app.Conf.Collection, "name", appCollection)
+	appProject := c.Param("project")
+	data, code, err := app.DB.FindOne(app.Conf.Database, app.Conf.Projects, "name", appProject)
 	if err != nil {
 		// fmt.Println(err) // TODO: log me !
 		c.JSON(code, gin.H{
@@ -67,7 +59,7 @@ func (app App) AdminUpdate(c *gin.Context) {
 		id := data["_id"].(bson.ObjectId).Hex()
 		var data2 FormData
 		if c.BindJSON(&data2) == nil {
-			code, err := app.DB.UpdateByID(app.Conf.Database, app.Conf.Collection, id, data2.Data)
+			code, err := app.DB.UpdateByID(app.Conf.Database, app.Conf.Projects, id, data2.Data)
 			if err != nil {
 				c.JSON(code, gin.H{
 					"status":  "error",
@@ -79,15 +71,14 @@ func (app App) AdminUpdate(c *gin.Context) {
 				})
 			}
 		}
-		// fmt.Println(data2)
 	}
 	// TODO: update app Collections
 }
 
-// curl -X DELETE 'http://localhost:8080/admin/collections/articles'
+// curl -X DELETE 'http://127.0.0.1:8080/admin/projects/hydra1'
 func (app App) AdminDelete(c *gin.Context) {
-	appCollection := c.Param("collection")
-	data, code, err := app.DB.FindOne(app.Conf.Database, app.Conf.Collection, "name", appCollection)
+	appProject := c.Param("project")
+	data, code, err := app.DB.FindOne(app.Conf.Database, app.Conf.Projects, "name", appProject)
 	if err != nil {
 		// fmt.Println(err) // TODO: log me !
 		c.JSON(code, gin.H{
@@ -96,15 +87,31 @@ func (app App) AdminDelete(c *gin.Context) {
 		})
 	} else {
 		id := data["_id"].(bson.ObjectId).Hex()
-		code, err := app.DB.DeleteByID(app.Conf.Database, app.Conf.Collection, id)
+		code, err := app.DB.DeleteByID(app.Conf.Database, app.Conf.Projects, id)
 		if err != nil {
 			c.JSON(code, gin.H{
 				"status":  "error",
 				"message": err.Error(),
 			})
 		} else {
-			c.JSON(code, "ok")
+			c.JSON(code, gin.H{
+				"status": "ok",
+			})
 		}
 	}
 	// TODO: update app Collections
+}
+
+// curl 'http://127.0.0.1:8080/admin/projects'
+func (app App) AdminList(c *gin.Context) {
+	data, code, err := app.DB.FindAll(app.Conf.Database, app.Conf.Projects)
+	if err != nil {
+		// fmt.Println(err) // TODO: log me !
+		c.JSON(code, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+	} else {
+		c.JSON(code, data)
+	}
 }
