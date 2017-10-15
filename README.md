@@ -17,6 +17,8 @@ To do:
 ### Admin examples
 
 ```sh
+# Basic auth - auth credentials are loaded from AuthCollection (see Conf)
+curl -u 'username:password' 'http://localhost:8080/admin/collections'
 # list all collections
 curl 'http://localhost:8080/admin/collections'
 # create a new collection (ex. articles)

@@ -18,18 +18,17 @@ var id string
 func apiSetup() *App {
 	gin.SetMode(gin.ReleaseMode)
 	app := App{
-		"Hydra Go",
-		Conf{
-			"_hydra",
-			"_collections",
-			"_auth",
+		Name: "Hydra Go",
+		Conf: Conf{
+			Database:       "_hydra",
+			Collection:     "_collections",
+			AuthCollection: "_auth",
 		},
-		DB{"localhost:27017"},
-		map[string]string{},
-		map[string]Collection{},
-		gin.Default(),
+		DB:     DB{"localhost:27017"},
+		Router: gin.Default(),
 	}
-	app.init()
+	app.Init()
+	app.RouterSetup()
 	return &app
 }
 

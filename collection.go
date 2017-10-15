@@ -18,7 +18,7 @@ type Collection struct {
 	Columns     map[string]Column `json:"columns" bson:"columns"`
 }
 
-func (collection Collection) validate(data bson.M) []error {
+func (collection Collection) Validate(data bson.M) []error {
 	var results []error
 	for k, v := range data {
 		rules := collection.Columns[k].Validations

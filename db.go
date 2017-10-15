@@ -13,7 +13,7 @@ type DB struct {
 	url string
 }
 
-func (db DB) connect() *mgo.Session {
+func (db DB) Connect() *mgo.Session {
 	session, err := mgo.Dial(db.url)
 	if err != nil {
 		panic(err)
@@ -25,7 +25,7 @@ func (db DB) connect() *mgo.Session {
 	return session
 }
 
-func (db DB) create(database string, collection string, data FormData) (result bson.M, code int, err error) {
+func (db DB) Create(database string, collection string, data FormData) (result bson.M, code int, err error) {
 	code = http.StatusInternalServerError
 	defer func() {
 		if r := recover(); r != nil {
@@ -33,7 +33,7 @@ func (db DB) create(database string, collection string, data FormData) (result b
 		}
 	}()
 
-	session := db.connect()
+	session := db.Connect()
 	defer session.Close()
 
 	coll := session.DB(database).C(collection)
@@ -48,7 +48,7 @@ func (db DB) create(database string, collection string, data FormData) (result b
 	return
 }
 
-func (db DB) deleteByID(database string, collection string, id string) (code int, err error) {
+func (db DB) DeleteByID(database string, collection string, id string) (code int, err error) {
 	code = http.StatusInternalServerError
 	defer func() {
 		if r := recover(); r != nil {
@@ -57,7 +57,7 @@ func (db DB) deleteByID(database string, collection string, id string) (code int
 			// runtime.Breakpoint()
 		}
 	}()
-	session := db.connect()
+	session := db.Connect()
 	defer session.Close()
 
 	coll := session.DB(database).C(collection)
@@ -72,7 +72,7 @@ func (db DB) deleteByID(database string, collection string, id string) (code int
 	return
 }
 
-func (db DB) findAll(database string, collection string) (results []bson.M, code int, err error) {
+func (db DB) FindAll(database string, collection string) (results []bson.M, code int, err error) {
 	code = http.StatusInternalServerError
 	defer func() {
 		if r := recover(); r != nil {
@@ -80,7 +80,7 @@ func (db DB) findAll(database string, collection string) (results []bson.M, code
 		}
 	}()
 
-	session := db.connect()
+	session := db.Connect()
 	defer session.Close()
 
 	coll := session.DB(database).C(collection)
@@ -94,7 +94,7 @@ func (db DB) findAll(database string, collection string) (results []bson.M, code
 	return
 }
 
-func (db DB) findByID(database string, collection string, id string) (result bson.M, code int, err error) {
+func (db DB) FindByID(database string, collection string, id string) (result bson.M, code int, err error) {
 	code = http.StatusInternalServerError
 	defer func() {
 		if r := recover(); r != nil {
@@ -103,7 +103,7 @@ func (db DB) findByID(database string, collection string, id string) (result bso
 			// runtime.Breakpoint()
 		}
 	}()
-	session := db.connect()
+	session := db.Connect()
 	defer session.Close()
 
 	coll := session.DB(database).C(collection)
@@ -118,7 +118,7 @@ func (db DB) findByID(database string, collection string, id string) (result bso
 	return
 }
 
-func (db DB) findOne(database string, collection string, key string, value string) (result bson.M, code int, err error) {
+func (db DB) FindOne(database string, collection string, key string, value string) (result bson.M, code int, err error) {
 	code = http.StatusInternalServerError
 	defer func() {
 		if r := recover(); r != nil {
@@ -127,7 +127,7 @@ func (db DB) findOne(database string, collection string, key string, value strin
 			// runtime.Breakpoint()
 		}
 	}()
-	session := db.connect()
+	session := db.Connect()
 	defer session.Close()
 
 	coll := session.DB(database).C(collection)
@@ -141,7 +141,7 @@ func (db DB) findOne(database string, collection string, key string, value strin
 	return
 }
 
-func (db DB) updateByID(database string, collection string, id string, data bson.M) (code int, err error) {
+func (db DB) UpdateByID(database string, collection string, id string, data bson.M) (code int, err error) {
 	code = http.StatusInternalServerError
 	defer func() {
 		if r := recover(); r != nil {
@@ -150,7 +150,7 @@ func (db DB) updateByID(database string, collection string, id string, data bson
 			// runtime.Breakpoint()
 		}
 	}()
-	session := db.connect()
+	session := db.Connect()
 	defer session.Close()
 
 	coll := session.DB(database).C(collection)

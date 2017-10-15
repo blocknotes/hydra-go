@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	validator "gopkg.in/go-playground/validator.v9"
 )
@@ -30,53 +32,55 @@ type Conf struct {
 	AuthCollection string
 }
 
-func (app *App) init() {
+func (app *App) Init() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			// err = fmt.Errorf("create: %v", r)
+			err = fmt.Errorf("App-Init: %v", r)
 		}
 	}()
-
 	validate = validator.New()
-
-	session := app.DB.connect()
+	session := app.DB.Connect()
 	defer session.Close()
-
+	// Load collections
 	coll := session.DB(app.Conf.Database).C(app.Conf.Collection)
 	var collections []Collection
 	if ret := coll.Find(nil).All(&collections); ret != nil {
 		panic(ret)
 	}
+	app.Collections = make(map[string]Collection)
 	for _, c := range collections {
 		app.Collections[c.Name] = c
 	}
-
+	// Load auth data
 	authColl := session.DB(app.Conf.Database).C(app.Conf.AuthCollection)
 	var authData []Auth
 	if ret := authColl.Find(nil).All(&authData); ret != nil {
 		panic(ret)
 	}
+	app.AuthData = make(map[string]string)
 	for _, c := range authData {
 		app.AuthData[c.Username] = c.Password
 	}
 
-	app.routerSetup()
+	return
 }
 
-func (app *App) routerSetup() {
+func (app *App) RouterSetup() {
+	app.Router = gin.Default()
+	// --- setup admin routes
 	authorized := app.Router.Group("/admin", gin.BasicAuth(gin.Accounts(app.AuthData)))
-	authorized.GET("/collections", app.adminList)
-	authorized.GET("/collections/:collection", app.adminRead)
-	authorized.POST("/collections", app.adminCreate)
-	authorized.PUT("/collections/:collection", app.adminUpdate)
-	authorized.DELETE("/collections/:collection", app.adminDelete)
-	// authorized.POST("/auth", app.adminAuthCreate) # TODO: create auth data
-	// authorized.PUT("/auth/:username", app.adminAuthUpdate) # TODO: update auth data
-
+	authorized.GET("/collections", app.AdminList)
+	authorized.GET("/collections/:collection", app.AdminRead)
+	authorized.POST("/collections", app.AdminCreate)
+	authorized.PUT("/collections/:collection", app.AdminUpdate)
+	authorized.DELETE("/collections/:collection", app.AdminDelete)
+	// authorized.POST("/auth", app.AdminAuthCreate) # TODO: create auth data
+	// authorized.PUT("/auth/:username", app.AdminAuthUpdate) # TODO: update auth data
+	// --- setup api routes
 	api := app.Router.Group("/api")
-	api.GET("/:database/:collection", app.list)
-	api.GET("/:database/:collection/:id", app.read)
-	api.POST("/:database/:collection", app.create)
-	api.PUT("/:database/:collection/:id", app.update)
-	api.DELETE("/:database/:collection/:id", app.delete)
+	api.GET("/:database/:collection", app.List)
+	api.GET("/:database/:collection/:id", app.Read)
+	api.POST("/:database/:collection", app.Create)
+	api.PUT("/:database/:collection/:id", app.Update)
+	api.DELETE("/:database/:collection/:id", app.Delete)
 }
